@@ -1,14 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { TeaTime } from '../tea-time';
+import { CommonService } from '../tabs/common.service';
 
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss']
 })
-export class Tab1Page {
+export class Tab1Page implements OnInit {
 
+  user = '';
   teaTypes = [
     {
       name: 'Tea'
@@ -31,35 +33,55 @@ export class Tab1Page {
   milkCoffeeCount = 0;
 
   constructor(
+    public commonService: CommonService,
     private alertController: AlertController
   ) { }
 
   placeOrder(type: number) {
-    this.presentAlert(type);
+    this.addToArray(type, this.user);
   }
 
-  async presentAlert(type: number) {
+  addToArray(type: number, person: string) {
+    const tea = {
+      name: person,
+      teaType: type
+    };
+    const len = this.tea.filter((itm) => itm.name === person).length;
+    if (len > 0) {
+      this.commonService.delete(this.tea.filter((itm) => itm.name === person)[0]);
+      this.commonService.addTeaList(tea);
+    } else {
+      this.commonService.addTeaList(tea);
+    }
+  }
+
+  subscription() {
+    this.commonService.getTeaList().subscribe((data) => {
+      this.tea = data;
+
+      this.teaCount = this.tea.filter((item) => item.teaType === 0).length;
+      this.milkTeaCount = this.tea.filter((item) => item.teaType === 1).length;
+      this.coffeeCount = this.tea.filter((item) => item.teaType === 2).length;
+      this.milkCoffeeCount = this.tea.filter((item) => item.teaType === 3).length;
+    });
+  }
+
+  async reset() {
     const alert = await this.alertController.create({
-      header: 'Who want ' + this.teaTypes[type].name + '?',
-      subHeader: type.toString(),
-      inputs: [
-        {
-          name: 'Name',
-          type: 'text',
-          placeholder: 'Name'
-        }
-      ],
+      header: 'Alert',
+      message: 'Are You Sure?',
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary'
+          text: 'Yes',
+          cssClass: 'primary',
+          handler: () => {
+            this.commonService.deleteAll(this.tea);
+          }
         },
         {
-          text: 'Okay',
-          handler: (alertData) => {
-            this.addToArray(type, alertData.Name);
-          }
+          text: 'No',
+          role: 'cancel',
+          cssClass: 'secondary'
         }
       ]
     });
@@ -67,18 +89,9 @@ export class Tab1Page {
     await alert.present();
   }
 
-  addToArray(type: number, person: string) {
-    this.tea = this.tea.filter((item) =>
-      item.name !== person);
-    this.tea.push({
-      name: person,
-      teaType: type
-    });
-
-    this.teaCount = this.tea.filter((item) => item.teaType === 0).length;
-    this.milkTeaCount = this.tea.filter((item) => item.teaType === 1).length;
-    this.coffeeCount = this.tea.filter((item) => item.teaType === 2).length;
-    this.milkCoffeeCount = this.tea.filter((item) => item.teaType === 3).length;
+  ngOnInit() {
+    this.subscription();
   }
+
 
 }
