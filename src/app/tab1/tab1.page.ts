@@ -25,6 +25,10 @@ export class Tab1Page {
   ];
 
   tea: TeaTime[] = [];
+  teaCount = 0;
+  milkTeaCount = 0;
+  coffeeCount = 0;
+  milkCoffeeCount = 0;
 
   constructor(
     private alertController: AlertController
@@ -64,24 +68,17 @@ export class Tab1Page {
   }
 
   addToArray(type: number, person: string) {
-    console.log(this.tea);
-    if (this.tea.length !== 0) {
-      this.tea.forEach(element => {
-        if (element.name === person) {
-          element.teaType = type;
-        } else {
-          this.tea.push({
-            teaType: type,
-            name: person
-          });
-        }
-      });
-    } else {
-      this.tea.push({
-        teaType: type,
-        name: person
-      });
-    }
+    this.tea = this.tea.filter((item) =>
+      item.name !== person);
+    this.tea.push({
+      name: person,
+      teaType: type
+    });
+
+    this.teaCount = this.tea.filter((item) => item.teaType === 0).length;
+    this.milkTeaCount = this.tea.filter((item) => item.teaType === 1).length;
+    this.coffeeCount = this.tea.filter((item) => item.teaType === 2).length;
+    this.milkCoffeeCount = this.tea.filter((item) => item.teaType === 3).length;
   }
 
 }
