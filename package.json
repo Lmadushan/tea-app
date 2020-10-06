@@ -1,6 +1,6 @@
 {
-  "name": "tea-app",
-  "version": "0.0.1",
+  "name": "tea ordering",
+  "version": "0.0.2",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
